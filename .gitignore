@@ -1,0 +1,7 @@
+﻿marine_MIS_service/gradle
+marine_MIS_service/src/test
+marine_MIS_service/.gitattributes
+*.gradle
+marine_MIS_service/gradlew
+marine_MIS_service/gradlew.bat
+marine_MIS_service/src/main/resources/application.properties
