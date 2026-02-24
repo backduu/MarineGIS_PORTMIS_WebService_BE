@@ -4,6 +4,8 @@ import com.bluespace.marine_mis_service.domain.enums.UserRole;
 import com.bluespace.marine_mis_service.domain.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,7 +30,7 @@ import java.util.List;
  * ===========================================================
  * </pre>
  */
-@Table(name = "user")
+@Table(name = "tb_user")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
