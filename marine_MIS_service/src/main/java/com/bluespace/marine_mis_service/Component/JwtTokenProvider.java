@@ -23,6 +23,7 @@ import java.util.Map;
  * 변경이력
  * -----------------------------------------------------------
  * 2026-02-23  백두현  최초작성
+ * 2026-02-24  parseClaimsJwt 은 서명되지 않은 JWT 파싱 시 쓰므로 parseClaimsJws 메서드를 사용하도록 수정
  * ===========================================================
  * </pre>
  */
@@ -34,7 +35,7 @@ public class JwtTokenProvider {
 
     public JwtTokenProvider() {
         // 비밀키를 프론트에서 받는다면 해당 키를 복호화한다.
-        String base64Secret = "abc.def";
+        String base64Secret = "Y29tLWJsdWVzcGFjZS1tYXJpbmUtbWlzLXNlcnZpY2Utc2VjcmV0LWtleS1tdXN0LWJlLWF0LWxlYXN0LTY0LWJ5dGVzLWxvbmc";
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Secret));
     }
 

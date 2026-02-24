@@ -4,6 +4,7 @@ import com.bluespace.marine_mis_service.Component.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,7 +32,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * </pre>
  */
 
-@Configurable
+@Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -53,7 +54,7 @@ public class SpringSecurityConfig {
                         // 0. 구체적인 경로를 먼저 설정
                         .requestMatchers("/api/auth/change").authenticated()
                         // 1. 인증 없이 접근 가능한 경로
-                        .requestMatchers("/api/user/signup", "/api/user/login").permitAll()
+                        .requestMatchers("/welcome/**", "/api/user/signup", "/api/user/login").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // 2. 나머지 /api/user/** 는 인증 필요
                         .requestMatchers("/api/user/**").authenticated()
