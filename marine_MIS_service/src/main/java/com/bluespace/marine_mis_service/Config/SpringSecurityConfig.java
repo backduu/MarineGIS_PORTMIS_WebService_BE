@@ -1,5 +1,6 @@
 package com.bluespace.marine_mis_service.Config;
 
+import com.bluespace.marine_mis_service.Component.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;

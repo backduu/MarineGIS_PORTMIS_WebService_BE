@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.Map;
  * ===========================================================
  * </pre>
  */
+@Component
 public class JwtTokenProvider {
     private final SecretKey secretKey;
     private final long validityInMilliseconds = 1000L * 60 * 60; // 1시간
