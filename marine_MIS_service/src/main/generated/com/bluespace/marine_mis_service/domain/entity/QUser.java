@@ -21,9 +21,17 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath address = createString("address");
 
+    public final DateTimePath<java.time.LocalDateTime> approvedAt = createDateTime("approvedAt", java.time.LocalDateTime.class);
+
+    public final DateTimePath<java.time.LocalDateTime> created = createDateTime("created", java.time.LocalDateTime.class);
+
+    public final DateTimePath<java.time.LocalDateTime> deleted = createDateTime("deleted", java.time.LocalDateTime.class);
+
     public final StringPath email = createString("email");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final DateTimePath<java.time.LocalDateTime> lastLogin = createDateTime("lastLogin", java.time.LocalDateTime.class);
 
     public final StringPath name = createString("name");
 
@@ -36,6 +44,8 @@ public class QUser extends EntityPathBase<User> {
     public final EnumPath<com.bluespace.marine_mis_service.domain.enums.UserRole> role = createEnum("role", com.bluespace.marine_mis_service.domain.enums.UserRole.class);
 
     public final EnumPath<com.bluespace.marine_mis_service.domain.enums.UserStatus> status = createEnum("status", com.bluespace.marine_mis_service.domain.enums.UserStatus.class);
+
+    public final DateTimePath<java.time.LocalDateTime> updated = createDateTime("updated", java.time.LocalDateTime.class);
 
     public final StringPath username = createString("username");
 

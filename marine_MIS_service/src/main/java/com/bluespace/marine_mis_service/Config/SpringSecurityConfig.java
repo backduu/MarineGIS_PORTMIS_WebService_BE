@@ -54,7 +54,7 @@ public class SpringSecurityConfig {
                         // 0. 구체적인 경로를 먼저 설정
                         .requestMatchers("/api/auth/change").authenticated()
                         // 1. 인증 없이 접근 가능한 경로
-                        .requestMatchers("/welcome/**", "/api/user/signup", "/api/user/login").permitAll()
+                        .requestMatchers("/welcome/**", "/api/user/signup", "/api/auth/login").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // 2. 나머지 /api/user/** 는 인증 필요
                         .requestMatchers("/api/user/**").authenticated()
