@@ -73,7 +73,14 @@ public class OdcloudApiItemReader<T> implements ItemReader<T> {
             if (response != null && response.getData() != null && !response.getData().isEmpty()) {
                 log.info("데이터 가져오기 성공: {} 건", response.getData().size());
                 this.dataIterator = response.getData().iterator();
-                
+
+                // API가 page 파라미터를 무시하는지 방어
+                if(currentPage > 1000) {
+                    log.error("비정상적인 무한 루프 감지! 강제 종료합니다. (Page: {})", currentPage);
+
+                    exhausted = true;
+                    return;
+                }
                 // 가져온 데이터가 perPage보다 적으면 다음 데이터가 없다고 판단합니다.
                 if (response.getData().size() < perPage) {
                     exhausted = true;
