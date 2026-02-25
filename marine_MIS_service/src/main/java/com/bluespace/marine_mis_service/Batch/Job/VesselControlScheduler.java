@@ -23,9 +23,9 @@ public class VesselControlScheduler {
     private final Job vesselControlJob;
 
     /**
-     * 매일 새벽 2시에 실행되도록 설정 (Cron 표현식: 초 분 시 일 월 요일)
+     * 매년 9월 1일에 실행되도록 설정 (Cron 표현식: 초 분 시 일 월 요일)
      */
-    @Scheduled(cron = "0 1  * * * *")
+    @Scheduled(cron = "0 0 0 1 9 ?")
     public void runVesselControlJob() {
         log.info("배치 작업 시작 예약: {}", LocalDateTime.now());
 
