@@ -45,9 +45,11 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + validityInMilliseconds); // 토큰 30분 유효기한
 
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("type", "reset_token");
+        claims.put("type", "access_token");
+        claims.put("role", role);
+        claims.put("username", username);
 
-        if(extraClaims != null & !extraClaims.isEmpty()) {
+        if(extraClaims != null && !extraClaims.isEmpty()) {
             claims.putAll(extraClaims);
         }
 
@@ -65,7 +67,7 @@ public class JwtTokenProvider {
             Jwts.parserBuilder()
                     .setSigningKey(secretKey) // 서명 검증용 키 설정
                     .build()
-                    .parseClaimsJwt(token); // 파싱 시 예외 발생 여부로 유효성 판단
+                    .parseClaimsJws(token); // 파싱 시 예외 발생 여부로 유효성 판단
             return true;
         } catch (Exception e) {
             return false; // 서명 불일치, 만료 등 예외 발생 시 false

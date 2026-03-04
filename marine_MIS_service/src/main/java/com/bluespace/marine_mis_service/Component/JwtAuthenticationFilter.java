@@ -44,41 +44,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException
     {
         final String authHeader = request.getHeader("Authorization");
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = null;
-        String username = null;
-        String email = null;
-        String role = null;
+        String token = authHeader.substring(7);
+        log.debug("Bearer Token Check: {}", token);
 
-        log.debug("Authorization header: {}", authHeader);
+        try {
+            if (jwtTokenProvider.validateToken(token)) {
+                String username = jwtTokenProvider.getUsernameFromToken(token);
 
-        if(authHeader.startsWith("Bearer ")){
-            token = authHeader.substring(7);
-            log.debug("Bearer Token: {}", token);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            email = jwtTokenProvider.getEmailFromToken(token);
-            username = jwtTokenProvider.getUsernameFromToken(token);
-            role = jwtTokenProvider.getRoleFromToken(token);
-        }
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-
-        // 토큰이 유효하다면 사용자 정보를 꺼내어 Spring Security의 SecurityContext에 인증 객체를 심어준다.
-        if(username != null && email != null && role != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            if(jwtTokenProvider.validateToken(token)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                log.debug(">>> authToken {}",  authToken);
-
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    log.debug("username: {}", username);
+                }
             }
+        } catch (Exception e) {
+            log.error("필터에서 에러: {}", e.getMessage());
         }
+
         filterChain.doFilter(request, response);
     }
 }
