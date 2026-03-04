@@ -24,8 +24,8 @@ public class CoastlineServiceImpl implements CoastlineService {
     }
 
     @Override
-    public Optional<CoastlineLocationDTO> getLocation(String name) {
-        return coastlineRepository.findLocationBySggNam(name)
+    public Optional<CoastlineLocationDTO> getLocation(String sggNam) {
+        return coastlineRepository.findLocationBySggNam(sggNam)
                 .map(map -> new CoastlineLocationDTO(
                         (String) map.get("centerJson"),
                         (String) map.get("bbox")
