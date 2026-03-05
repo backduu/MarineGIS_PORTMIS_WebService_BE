@@ -14,3 +14,12 @@ Content-Type: application/json
   "username": "user1231",
   "password": "123456789"
 }
+
+### Coastline Regions API Test
+GET http://localhost:8080/api/coastline/regions
+Accept: application/json
+
+### Coastline Location API Test
+GET http://localhost:8080/api/coastline/location?name=전라남도 강진군
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MkB0ZXN0LmNvbSIsInR5cGUiOiJyZXNldF90b2tlbiIsInJvbGUiOiJVU0VSX1JPTEUiLCJ1c2VybmFtZSI6InVzZXIxMjMxIiwiaWF0IjoxNzcyNjAxMzUxLCJleHAiOjE3NzI2MDQ5NTF9.WejgG0S7u47MKeIAN2xsHGNiQckZli3hJi0r7ylZhE5bavo8VFpwUqo-BWt1W5tCILp8mWYIDpm8PqvEm7f6_A
