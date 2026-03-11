@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WaterTempRepository extends JpaRepository<WaterTemp, Long>, WaterTempRepositoryCustom {
+    boolean existsByObsCodeAndObsrvnDt(String obsCode, String obsrvnDt);
 }

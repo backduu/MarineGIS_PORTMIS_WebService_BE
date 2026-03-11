@@ -118,14 +118,16 @@ public class ObservatoryServiceImpl implements ObservatoryService {
         }
 
         // 중복 데이터 방지를 위해 DB에 있는 기존 데이터 조회 (obsCode, obsrvnDt 기반)
-        // 여기서는 간단하게 개별 save 시 예외 처리 방식을 유지하되, 
-        // @Transactional 내부에서 API 호출을 분리한 것만으로도 커넥션 점유 시간을 대폭 줄일 수 있음.
         for (WaterTemp entity : entities) {
             try {
-                // saveAll 대신 개별 save를 쓰는 이유는 특정 데이터 중복 시 전체 롤백을 피하기 위함
-                // (물론 이 메서드 전체가 @Transactional이므로 예외 발생 시 롤백됨)
-                // 만약 중복 데이터가 빈번하다면 존재 여부 체크 후 저장이 더 안전함.
-                waterTempRepository.save(entity);
+                // 이미 동일한 관측소 코드와 관측 일시의 데이터가 있는지 확인
+                boolean exists = waterTempRepository.existsByObsCodeAndObsrvnDt(entity.getObsCode(), entity.getObsrvnDt());
+                
+                if (!exists) {
+                    waterTempRepository.save(entity);
+                } else {
+                    log.debug("Water temp data already exists: {} - {}", entity.getObsCode(), entity.getObsrvnDt());
+                }
             } catch (Exception e) {
                 log.warn("Failed to save water temp data (possibly duplicate): {} - {}", entity.getObsrvnDt(), e.getMessage());
             }
