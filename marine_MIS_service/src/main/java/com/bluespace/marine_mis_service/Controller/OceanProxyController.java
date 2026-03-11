@@ -48,7 +48,7 @@ public class OceanProxyController {
                 layers, serviceKey, layers, bbox, width, height, srs
         );
 
-        System.out.println("Final Target URL: " + targetUrl);
+        //System.out.println("Final Target URL: " + targetUrl);
 
         try {
             HttpHeaders headers = new HttpHeaders();
