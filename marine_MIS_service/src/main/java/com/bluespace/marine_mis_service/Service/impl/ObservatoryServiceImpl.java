@@ -10,6 +10,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,9 +26,13 @@ public class ObservatoryServiceImpl implements ObservatoryService {
 
     private final WaterTempRepository waterTempRepository;
     private final RestTemplate restTemplate;
+    // API호출은 트랜잭션 밖에서 수행하고 DB 저장 로직만 명확하게 트랜잭션으로 감싸는 방식
+    // 프록시 문제를 깔끔하게 피할 수 있다.
+    private final TransactionTemplate transactionTemplate;
 
-    public ObservatoryServiceImpl(WaterTempRepository waterTempRepository) {
+    public ObservatoryServiceImpl(WaterTempRepository waterTempRepository, TransactionTemplate transactionTemplate) {
         this.waterTempRepository = waterTempRepository;
+        this.transactionTemplate = transactionTemplate;
         
         // Timeout 설정: 네트워크 지연으로 인한 스레드 점유 방지
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
@@ -101,8 +106,10 @@ public class ObservatoryServiceImpl implements ObservatoryService {
                                     .build())
                             .collect(Collectors.toList());
 
-                    // DB 저장은 별도 Transaction으로 분리
-                    return saveWaterTempData(waterTempEntities);
+                    // DB 저장은 트랜잭션 템플릿 안에서 수행하도록 합니다.
+                    return transactionTemplate.execute(status -> {
+                       return saveWaterTempData(waterTempEntities);
+                    });
                 }
             }
         } catch (Exception e) {
@@ -111,7 +118,6 @@ public class ObservatoryServiceImpl implements ObservatoryService {
         return Collections.emptyList();
     }
 
-    @Transactional
     public List<WaterTemp> saveWaterTempData(List<WaterTemp> entities) {
         if (entities == null || entities.isEmpty()) {
             return Collections.emptyList();
