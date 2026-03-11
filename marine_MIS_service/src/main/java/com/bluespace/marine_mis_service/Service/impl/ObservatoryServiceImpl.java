@@ -1,8 +1,11 @@
 package com.bluespace.marine_mis_service.Service.impl;
 
+import com.bluespace.marine_mis_service.DTO.ObsLocationApiResponseDTO;
 import com.bluespace.marine_mis_service.DTO.WaterTempApiResponseDTO;
+import com.bluespace.marine_mis_service.Repository.ObsLocationsRepository;
 import com.bluespace.marine_mis_service.Repository.WaterTempRepository;
 import com.bluespace.marine_mis_service.Service.ObservatoryService;
+import com.bluespace.marine_mis_service.domain.entity.ObsLocations;
 import com.bluespace.marine_mis_service.domain.entity.WaterTemp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,13 +28,15 @@ import java.util.stream.Collectors;
 public class ObservatoryServiceImpl implements ObservatoryService {
 
     private final WaterTempRepository waterTempRepository;
+    private final ObsLocationsRepository obsLocationsRepository;
     private final RestTemplate restTemplate;
     // API호출은 트랜잭션 밖에서 수행하고 DB 저장 로직만 명확하게 트랜잭션으로 감싸는 방식
     // 프록시 문제를 깔끔하게 피할 수 있다.
     private final TransactionTemplate transactionTemplate;
 
-    public ObservatoryServiceImpl(WaterTempRepository waterTempRepository, TransactionTemplate transactionTemplate) {
+    public ObservatoryServiceImpl(WaterTempRepository waterTempRepository, ObsLocationsRepository obsLocationsRepository, TransactionTemplate transactionTemplate) {
         this.waterTempRepository = waterTempRepository;
+        this.obsLocationsRepository = obsLocationsRepository;
         this.transactionTemplate = transactionTemplate;
         
         // Timeout 설정: 네트워크 지연으로 인한 스레드 점유 방지
@@ -54,6 +59,88 @@ public class ObservatoryServiceImpl implements ObservatoryService {
         // 실시간성이 중요하므로 API 호출 후 저장하는 fetchAndSave를 주로 사용할 것으로 예상됨.
         return waterTempRepository.findWaterTempByConditions(obsCode, reqDate, reqDate);
     }
+    @Override
+    public List<ObsLocations> fetchAndSaveObservationLocation(Integer page, Integer size) {
+        try {
+            // API 요청 URL 설정
+            String url = "https://api.odcloud.kr/api/15146602/v1/uddi:81b0665b-4f21-41e8-91f1-d3ecc4a7a3f1";
+            
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                    .queryParam("serviceKey", serviceKey)
+                    .queryParam("page", page)
+                    .queryParam("perPage", size)
+                    .queryParam("returnType", "json")
+                    .build(true)
+                    .toUri();
+
+            log.info("Request ObsLocations URI: {}", uri);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<ObsLocationApiResponseDTO> responseEntity = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    entity,
+                    ObsLocationApiResponseDTO.class
+            );
+
+            ObsLocationApiResponseDTO response = responseEntity.getBody();
+
+            if (response != null && response.getData() != null) {
+                List<ObsLocations> locations = response.getData().stream()
+                        .map(data -> ObsLocations.builder()
+                                .obsCode(data.getObsCode())
+                                .obsType(data.getObsType())
+                                .obsvtrNm(data.getObsvtrNm())
+                                .lat(data.getLat())
+                                .lon(data.getLon())
+                                .obsvtrEnNm(data.getObsvtrEnNm())
+                                .build())
+                        .collect(Collectors.toList());
+
+                return transactionTemplate.execute(status -> {
+                    return saveObsLocationData(locations);
+                });
+            }
+        } catch (Exception e) {
+            log.error("Error fetching observation locations: ", e);
+        }
+        return Collections.emptyList();
+    }
+
+    public List<ObsLocations> saveObsLocationData(List<ObsLocations> entities) {
+        // 중복된 관측소 코드가 있을 경우 업데이트 또는 건너뛰기 로직
+        if (entities == null || entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        for (ObsLocations entity : entities) {
+            try {
+                obsLocationsRepository.findByObsCode(entity.getObsCode())
+                        .ifPresentOrElse(
+                            existing -> {
+                                // 기존 데이터가 있으면 정보 업데이트
+                                existing.setObsType(entity.getObsType());
+                                existing.setObsvtrNm(entity.getObsvtrNm());
+                                existing.setLat(entity.getLat());
+                                existing.setLon(entity.getLon());
+                                existing.setObsvtrEnNm(entity.getObsvtrEnNm());
+                                obsLocationsRepository.save(existing);
+                            },
+                            () -> {
+                                // 신규 데이터면 저장
+                                obsLocationsRepository.save(entity);
+                            }
+                        );
+            } catch (Exception e) {
+                log.warn("Failed to save observation location: {} - {}", entity.getObsCode(), e.getMessage());
+            }
+        }
+        return entities;
+    }
+
 
     @Override
     public List<WaterTemp> fetchAndSaveWaterTemp(String obsCode, String reqDate) {

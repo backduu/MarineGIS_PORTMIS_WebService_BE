@@ -1,6 +1,7 @@
 package com.bluespace.marine_mis_service.Controller;
 
 import com.bluespace.marine_mis_service.Service.ObservatoryService;
+import com.bluespace.marine_mis_service.domain.entity.ObsLocations;
 import com.bluespace.marine_mis_service.domain.entity.WaterTemp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,4 +46,12 @@ public class ObservatoryController {
         return observatoryService.fetchAndSaveWaterTemp(obsCode, reqDate);
     }
 
+    @GetMapping("/location")
+    public List<ObsLocations> getObsLocations(
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "size") Integer size
+    ) {
+
+        return observatoryService.fetchAndSaveObservationLocation(page, size);
+    }
 }
