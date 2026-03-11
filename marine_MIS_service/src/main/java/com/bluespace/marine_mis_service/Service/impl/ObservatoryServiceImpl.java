@@ -54,14 +54,14 @@ public class ObservatoryServiceImpl implements ObservatoryService {
     public List<WaterTemp> fetchAndSaveWaterTemp(String obsCode, String reqDate) {
         try {
             // URI 빌드 (이미 인코딩된 키인 경우 build(true) 사용)
-            URI uri = UriComponentsBuilder.fromHttpUrl(END_POINT)
+            URI uri = UriComponentsBuilder.fromUriString(END_POINT)
                     .queryParam("serviceKey", serviceKey)
                     .queryParam("type", "json")
                     .queryParam("obsCode", obsCode)
                     .queryParam("reqDate", reqDate)
                     .queryParam("numOfRows", 300)
                     .queryParam("include", "lat,lot,obsvtrNm,obsrvnDt,wtem")
-                    .build(true) // 인코딩된 상태로 URI 객체 생성
+                    .build(true) // 인코딩된 상태로 URI 객체 생성, 이중 인코딩 문제를 피하는데 도움이 된다.
                     .toUri();
 
             log.info("Request URI: {}", uri);
