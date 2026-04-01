@@ -25,15 +25,25 @@ public class WelcomeController {
     @GetMapping("/getMembers")
     public List<User> getMembers() {
         // 임시 데이터 저장 (테스트할 때마다 중복 생성될 수 있으니 주의)
+//        User testUser = User.builder()
+//                .username("test_user_" + System.currentTimeMillis()) // 중복 방지
+//                .name("백두현")
+//                .password("1234")
+//                .email("test@test.com")
+//                .phone("01012345678")
+//                .role(UserRole.ROLE_USER)
+//                .status(UserStatus.ACTIVE)
+//                .build();
+
         User testUser = User.builder()
-                .username("test_user_" + System.currentTimeMillis()) // 중복 방지
-                .name("백두현")
-                .password("1234")
-                .email("test@test.com")
+                .username("test_user_" + System.currentTimeMillis())
+                .name("제임스")
+                .password("123456789")
+                .email("test3@test.com")
                 .phone("01012345678")
-                .role(UserRole.USER_ROLE)
+                .role(UserRole.ROLE_AUTHENTICATED)
                 .status(UserStatus.ACTIVE)
-                .build();
+                        .build();
 
         userRepository.save(testUser);
 

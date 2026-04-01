@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum UserRole {
-    ADMIN_ROLE("관리자 권한"),
-    USER_ROLE("사용자권한");
+    ADMIN("관리자 권한"),
+    GROUP_ADMIN("그룹 관리자 권한"),
+    ROLE_USER("사용자권한"),
+    ROLE_ANONYMOUS("익명 사용자 권한"),
+    ROLE_AUTHENTICATED("인증 사용자 권한");
 
     private final String description;
 }
