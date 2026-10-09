@@ -5,6 +5,20 @@ GET https://examples.http-client.intellij.net/get
 ###
 GET http://localhost:8080/welcome/getMembers
 
+### Send POST request with json body
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "user1231",
+  "password": "123456789",
+  "name": "김철수",
+  "address": "서울특별시 낭만구 낭만로 12-34, 낭만빌딩 101호",
+  "email": "kchch@naver.com",
+  "nickname": "철철이",
+  "phone": "01021321231"
+}
+
 
 ### Send POST request with json body
 POST http://localhost:8080/api/auth/login
